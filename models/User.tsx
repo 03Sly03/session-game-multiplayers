@@ -4,8 +4,8 @@ mongoose.set('strictQuery', false);
 
 const userSchema = new mongoose.Schema(
   {
-    username: { type: String, required: true },
-    message: { type: String, required: true },
+    username: { type: String, required: false },
+    message: { type: String, required: false },
   },
   {
     timestamps: true,

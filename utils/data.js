@@ -1,4 +1,4 @@
-const theData = {
+const data = {
   users: [
     {
       username: 'SLY',
@@ -10,3 +10,5 @@ const theData = {
     },
   ],
 };
+
+export default data;

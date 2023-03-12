@@ -1,4 +1,7 @@
 import Layout from '@/components/Layout';
+import User from '@/models/User';
+import db from '@/utils/db';
+import axios from 'axios';
 import { useState } from 'react';
 
 type MessageT = {
@@ -6,15 +9,29 @@ type MessageT = {
   message: string;
 };
 
-const submit = (e: any) => {
-  e.preventDefault();
+type Props = {
+  users: MessageT[];
 };
 
-export default function Home() {
+export default function Home({ users }: Props) {
+  console.log('les users & allMessages: ', users);
   const [username, setUsername] = useState('username');
   const [messages, setMessages] = useState<MessageT[]>([]);
   const [message, setMessage] = useState('');
-
+  const submit = async (e: any) => {
+    e.preventDefault();
+    console.log('test: ', username, message);
+    try {
+      await axios({
+        method: 'post',
+        url: `/api/sendMessages`,
+        data: { username: username, message: message },
+      });
+      console.log('message added successfully');
+    } catch (error) {
+      console.log('message not added: ', error);
+    }
+  };
   return (
     <Layout title="Accueil">
       <div className="flex flex-col space-y-10 items-center">
@@ -26,7 +43,7 @@ export default function Home() {
           className="border border-black p-2 text-center w-fit"
         />
         <div className="border-t-2 w-[90vw] p-10 min-h-[45vh]">
-          {messages.map((message, index) => {
+          {users.map((message, index) => {
             return (
               <div key={index}>
                 <h2 className="font-bold">{message.username}</h2>
@@ -47,4 +64,17 @@ export default function Home() {
       </div>
     </Layout>
   );
+}
+
+export async function getServerSideProps() {
+  await db.connect();
+  const users = await User.find().lean();
+  // let allMessages: string[];
+  // users.map((user) => allMessages.push(user.message));
+  return {
+    props: {
+      // allMessages: allMessages ,
+      users: users.map(db.convertDocToObj),
+    },
+  };
 }
